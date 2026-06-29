@@ -2,9 +2,11 @@
 
 namespace Tabadev\FastHelp\Models;
 
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Tabadev\FastHelp\Database\Factories\MessageFactory;
 use Tabadev\FastHelp\Enums\MessageSender;
 
 class Message extends Model
@@ -24,5 +26,10 @@ class Message extends Model
     public function conversation(): BelongsTo
     {
         return $this->belongsTo(Conversation::class);
+    }
+
+    protected static function newFactory(): Factory
+    {
+        return MessageFactory::new();
     }
 }

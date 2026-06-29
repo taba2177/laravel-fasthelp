@@ -2,12 +2,14 @@
 
 namespace Tabadev\FastHelp\Models;
 
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Str;
+use Tabadev\FastHelp\Database\Factories\ConversationFactory;
 use Tabadev\FastHelp\Enums\ConversationStatus;
 
 class Conversation extends Model
@@ -31,6 +33,11 @@ class Conversation extends Model
                 $conversation->uuid = (string) Str::uuid();
             }
         });
+    }
+
+    protected static function newFactory(): Factory
+    {
+        return ConversationFactory::new();
     }
 
     public function messages(): HasMany
