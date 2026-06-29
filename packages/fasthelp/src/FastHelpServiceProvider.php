@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use Tabadev\FastHelp\Contracts\SmartReply;
+use Tabadev\FastHelp\Livewire\AgentChat;
 use Tabadev\FastHelp\Livewire\Widget;
 use Tabadev\FastHelp\Services\Gemini\GeminiSmartReply;
 
@@ -48,6 +49,7 @@ class FastHelpServiceProvider extends ServiceProvider
         }
 
         Livewire::component('fasthelp-widget', Widget::class);
+        Livewire::component('fasthelp-agent-chat', AgentChat::class);
     }
 
     /**

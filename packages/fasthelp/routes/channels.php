@@ -37,7 +37,7 @@ Broadcast::channel($prefix.'.conversation.{uuid}', function ($user, $uuid) {
 
     $isAgent = app(AgentResolver::class)->isAgent($user);
 
-    $isOwningUser = $conversation->client_type === get_class($user)
+    $isOwningUser = $conversation->client_type === $user->getMorphClass()
         && (int) $conversation->client_id === (int) $user->getKey();
 
     return $isAgent || $isOwningUser;
