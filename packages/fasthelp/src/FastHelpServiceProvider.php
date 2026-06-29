@@ -2,6 +2,7 @@
 
 namespace Tabadev\FastHelp;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use Tabadev\FastHelp\Contracts\SmartReply;
@@ -31,6 +32,7 @@ class FastHelpServiceProvider extends ServiceProvider
         $this->registerRoutes();
         $this->registerPublishing();
         $this->registerLivewireComponents();
+        $this->registerBladeDirectives();
     }
 
     /**
@@ -78,6 +80,20 @@ class FastHelpServiceProvider extends ServiceProvider
         }
 
         $this->loadRoutesFrom($routes);
+    }
+
+    /**
+     * Register the `@fastHelpWidget` Blade directive, a single drop-in
+     * line hosts can add to any page to render the widget plus its
+     * published CSS/JS assets.
+     */
+    protected function registerBladeDirectives(): void
+    {
+        if (! class_exists(Blade::class)) {
+            return;
+        }
+
+        Blade::directive('fastHelpWidget', fn () => "<?php echo view('fasthelp::embed')->render(); ?>");
     }
 
     /**
