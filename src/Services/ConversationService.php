@@ -11,6 +11,7 @@ use Tabadev\FastHelp\Events\MessageSent;
 use Tabadev\FastHelp\Models\Conversation;
 use Tabadev\FastHelp\Models\Message;
 use Tabadev\FastHelp\Support\Identity;
+use Tabadev\FastHelp\Support\Settings;
 
 class ConversationService
 {
@@ -58,7 +59,7 @@ class ConversationService
             return $message;
         });
 
-        if ($conversation->status === ConversationStatus::Open && config('fasthelp.ai.enabled')) {
+        if ($conversation->status === ConversationStatus::Open && app(Settings::class)->get('ai.enabled')) {
             $result = app(SmartReply::class)->reply($conversation, $body);
 
             if ($result->shouldHandoff) {

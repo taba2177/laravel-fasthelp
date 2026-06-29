@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Tabadev\FastHelp\Enums\AgentPresence;
 use Tabadev\FastHelp\Events\AgentPresenceChanged;
 use Tabadev\FastHelp\Models\AgentStatus;
+use Tabadev\FastHelp\Support\Settings;
 
 class PresenceService
 {
@@ -52,6 +53,6 @@ class PresenceService
 
     private function staleAfter(): int
     {
-        return (int) config('fasthelp.presence.stale_after', 60);
+        return (int) app(Settings::class)->get('presence.stale_after', 60);
     }
 }

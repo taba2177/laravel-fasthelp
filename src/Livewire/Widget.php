@@ -7,6 +7,7 @@ use Tabadev\FastHelp\Models\Conversation;
 use Tabadev\FastHelp\Services\ConversationService;
 use Tabadev\FastHelp\Services\PresenceService;
 use Tabadev\FastHelp\Support\IdentityResolver;
+use Tabadev\FastHelp\Support\Settings;
 
 class Widget extends Component
 {
@@ -134,13 +135,18 @@ class Widget extends Component
 
     public function render()
     {
+        $settings = app(Settings::class);
+
         return view('fasthelp::livewire.widget', [
-            'widgetEnabled' => (bool) config('fasthelp.widget.enabled', true),
-            'widgetTitle' => config('fasthelp.widget.title', 'Need help?'),
-            'widgetGreeting' => config('fasthelp.widget.greeting', 'Hi! How can we help you today?'),
-            'widgetPosition' => config('fasthelp.widget.position', 'bottom-right'),
-            'widgetColors' => config('fasthelp.widget.colors', []),
-            'widgetIcon' => config('fasthelp.widget.launcher_icon'),
+            'widgetEnabled' => (bool) $settings->get('widget.enabled', true),
+            'widgetTitle' => $settings->get('widget.title', 'Need help?'),
+            'widgetGreeting' => $settings->get('widget.greeting', 'Hi! How can we help you today?'),
+            'widgetPosition' => $settings->get('widget.position', 'bottom-right'),
+            'widgetColors' => [
+                'primary' => $settings->get('widget.colors.primary'),
+                'on_primary' => $settings->get('widget.colors.on_primary'),
+            ],
+            'widgetIcon' => $settings->get('widget.launcher_icon'),
         ]);
     }
 }

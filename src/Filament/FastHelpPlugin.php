@@ -4,6 +4,8 @@ namespace Tabadev\FastHelp\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Tabadev\FastHelp\Filament\Pages\FastHelpSettings;
+use Tabadev\FastHelp\Filament\Resources\AgentResource;
 use Tabadev\FastHelp\Filament\Resources\ConversationResource;
 
 class FastHelpPlugin implements Plugin
@@ -20,7 +22,8 @@ class FastHelpPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-        $panel->resources($this->resources());
+        $panel->resources($this->resources())
+            ->pages($this->pages());
     }
 
     public function boot(Panel $panel): void
@@ -31,15 +34,25 @@ class FastHelpPlugin implements Plugin
     /**
      * The set of Filament resources registered by this plugin.
      *
-     * Kept as its own method so a future task can append AgentResource
-     * (and any others) without touching register().
-     *
      * @return array<class-string>
      */
     protected function resources(): array
     {
         return [
             ConversationResource::class,
+            AgentResource::class,
+        ];
+    }
+
+    /**
+     * The set of standalone Filament pages registered by this plugin.
+     *
+     * @return array<class-string>
+     */
+    protected function pages(): array
+    {
+        return [
+            FastHelpSettings::class,
         ];
     }
 }

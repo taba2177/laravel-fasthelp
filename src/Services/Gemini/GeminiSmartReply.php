@@ -8,6 +8,7 @@ use Tabadev\FastHelp\Contracts\SmartReply;
 use Tabadev\FastHelp\Enums\MessageSender;
 use Tabadev\FastHelp\Models\Conversation;
 use Tabadev\FastHelp\Services\SmartReplyResult;
+use Tabadev\FastHelp\Support\Settings;
 
 class GeminiSmartReply implements SmartReply
 {
@@ -15,7 +16,7 @@ class GeminiSmartReply implements SmartReply
 
     public function reply(Conversation $conversation, string $message): SmartReplyResult
     {
-        $handoffKeywords = config('fasthelp.ai.handoff_keywords', []);
+        $handoffKeywords = app(Settings::class)->get('ai.handoff_keywords', []);
         $lowerMessage = strtolower($message);
 
         foreach ($handoffKeywords as $keyword) {
@@ -27,8 +28,8 @@ class GeminiSmartReply implements SmartReply
         try {
             $fullPrompt = $this->buildPrompt($conversation, $message);
 
-            $apiKey = config('fasthelp.ai.api_key');
-            $model = config('fasthelp.ai.model', 'gemini-1.5-flash');
+            $apiKey = app(Settings::class)->get('ai.api_key');
+            $model = app(Settings::class)->get('ai.model', 'gemini-1.5-flash');
 
             $response = $this->client()->post("models/{$model}:generateContent?key={$apiKey}", [
                 'json' => [
@@ -62,7 +63,7 @@ class GeminiSmartReply implements SmartReply
 
     private function buildPrompt(Conversation $conversation, string $message): string
     {
-        $lines = [config('fasthelp.ai.system_prompt')];
+        $lines = [app(Settings::class)->get('ai.system_prompt')];
 
         $recentMessages = $conversation->messages()
             ->latest()
