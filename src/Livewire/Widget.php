@@ -22,6 +22,8 @@ class Widget extends Component
 
     public string $status = 'open';
 
+    public ?string $pageUrl = null;
+
     public function mount(): void
     {
         $this->onlineCount = app(PresenceService::class)->onlineCount();
@@ -42,7 +44,10 @@ class Widget extends Component
         if ($this->conversationUuid === null) {
             $identity = app(IdentityResolver::class)->resolve();
 
-            $conversation = app(ConversationService::class)->start($identity, request()->headers->get('referer'));
+            $conversation = app(ConversationService::class)->start(
+                $identity,
+                $this->pageUrl ?? request()->headers->get('referer')
+            );
 
             $this->conversationUuid = $conversation->uuid;
             $this->status = $conversation->status->value;
