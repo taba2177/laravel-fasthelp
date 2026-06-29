@@ -3,7 +3,9 @@
 namespace Tabadev\FastHelp;
 
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 use Tabadev\FastHelp\Contracts\SmartReply;
+use Tabadev\FastHelp\Livewire\Widget;
 use Tabadev\FastHelp\Services\Gemini\GeminiSmartReply;
 
 class FastHelpServiceProvider extends ServiceProvider
@@ -28,6 +30,22 @@ class FastHelpServiceProvider extends ServiceProvider
         $this->registerChannels();
         $this->registerRoutes();
         $this->registerPublishing();
+        $this->registerLivewireComponents();
+    }
+
+    /**
+     * Register the client-facing Livewire widget component.
+     *
+     * Guarded on class_exists() so the package degrades gracefully if
+     * Livewire is somehow absent, even though it is a hard dependency.
+     */
+    protected function registerLivewireComponents(): void
+    {
+        if (! class_exists(Livewire::class)) {
+            return;
+        }
+
+        Livewire::component('fasthelp-widget', Widget::class);
     }
 
     /**
