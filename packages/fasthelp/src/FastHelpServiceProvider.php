@@ -9,12 +9,15 @@ use Tabadev\FastHelp\Contracts\SmartReply;
 use Tabadev\FastHelp\Livewire\AgentChat;
 use Tabadev\FastHelp\Livewire\Widget;
 use Tabadev\FastHelp\Services\Gemini\GeminiSmartReply;
+use Tabadev\FastHelp\Support\Settings;
 
 class FastHelpServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/fasthelp.php', 'fasthelp');
+
+        $this->app->singleton(Settings::class);
 
         $this->app->bind(SmartReply::class, function () {
             return match (config('fasthelp.ai.driver', 'gemini')) {
