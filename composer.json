@@ -5,6 +5,9 @@
     "description": "The skeleton application for the Laravel framework.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
+    "repositories": [
+        { "type": "path", "url": "packages/fasthelp", "options": { "symlink": true } }
+    ],
     "require": {
         "php": "^8.2",
         "filament/filament": "^3.3",
@@ -12,7 +15,8 @@
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
-        "sinnbeck/markdom": "^2.1"
+        "sinnbeck/markdom": "^2.1",
+        "tabadev/laravel-fasthelp": "@dev"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

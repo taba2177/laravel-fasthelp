@@ -1,0 +1,47 @@
+{
+    "name": "tabadev/laravel-fasthelp",
+    "description": "FastHelp — drop-in live-support widget with real-time agent chat, presence, AI first-line and a Filament admin for Laravel.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["laravel", "filament", "livewire", "support", "live-chat", "reverb"],
+    "require": {
+        "php": "^8.2",
+        "illuminate/contracts": "^12.0",
+        "illuminate/support": "^12.0",
+        "livewire/livewire": "^3.0",
+        "filament/filament": "^3.3",
+        "guzzlehttp/guzzle": "^7.9"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "laravel/pint": "^1.13"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tabadev\\FastHelp\\": "src/",
+            "Tabadev\\FastHelp\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tabadev\\FastHelp\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Tabadev\\FastHelp\\FastHelpServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        },
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
