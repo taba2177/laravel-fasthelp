@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Broadcast;
 use Tabadev\FastHelp\Models\Conversation;
+use Tabadev\FastHelp\Support\AgentResolver;
 
 $prefix = config('fasthelp.broadcasting.channel_prefix', 'fasthelp');
 
@@ -10,8 +11,7 @@ $prefix = config('fasthelp.broadcasting.channel_prefix', 'fasthelp');
 
 // Presence channel: live agent roster for the agent dashboard.
 Broadcast::channel($prefix.'.presence.agents', function ($user) {
-    // TODO(Task 8): tighten to AgentResolver::isAgent($user)
-    if (! $user) {
+    if (! app(AgentResolver::class)->isAgent($user)) {
         return false;
     }
 
@@ -23,8 +23,7 @@ Broadcast::channel($prefix.'.presence.agents', function ($user) {
 
 // Private channel: agent notifications (new conversations).
 Broadcast::channel($prefix.'.agents', function ($user) {
-    // TODO(Task 8): tighten to AgentResolver::isAgent($user)
-    return $user !== null;
+    return app(AgentResolver::class)->isAgent($user);
 });
 
 // Private channel: messages + typing for a single conversation.
@@ -36,8 +35,7 @@ Broadcast::channel($prefix.'.conversation.{uuid}', function ($user, $uuid) {
         return false;
     }
 
-    // TODO(Task 8): tighten to AgentResolver::isAgent($user)
-    $isAgent = $user !== null;
+    $isAgent = app(AgentResolver::class)->isAgent($user);
 
     $isOwningUser = $conversation->client_type === get_class($user)
         && (int) $conversation->client_id === (int) $user->getKey();
