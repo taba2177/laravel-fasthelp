@@ -3,6 +3,7 @@
 namespace Tabadev\FastHelp\Services;
 
 use Illuminate\Support\Facades\DB;
+use Tabadev\FastHelp\Contracts\SmartReply;
 use Tabadev\FastHelp\Enums\ConversationStatus;
 use Tabadev\FastHelp\Enums\MessageSender;
 use Tabadev\FastHelp\Events\ConversationStarted;
@@ -39,7 +40,7 @@ class ConversationService
 
     public function postClientMessage(Conversation $conversation, string $body): Message
     {
-        return DB::transaction(function () use ($conversation, $body) {
+        $message = DB::transaction(function () use ($conversation, $body) {
             $message = Message::create([
                 'conversation_id' => $conversation->id,
                 'sender_type' => MessageSender::Client,
@@ -56,6 +57,28 @@ class ConversationService
 
             return $message;
         });
+
+        if ($conversation->status === ConversationStatus::Open && config('fasthelp.ai.enabled')) {
+            $result = app(SmartReply::class)->reply($conversation, $body);
+
+            if ($result->shouldHandoff) {
+                $this->requestHumanHandoff($conversation);
+            } elseif ($result->reply !== null) {
+                $bot = $conversation->messages()->create([
+                    'sender_type' => MessageSender::Bot,
+                    'sender_id' => null,
+                    'body' => $result->reply,
+                ]);
+
+                $conversation->forceFill(['last_message_at' => now()])->save();
+
+                $bot->setRelation('conversation', $conversation);
+
+                event(new MessageSent($bot));
+            }
+        }
+
+        return $message;
     }
 
     public function postAgentMessage(Conversation $conversation, int $agentId, string $body): Message

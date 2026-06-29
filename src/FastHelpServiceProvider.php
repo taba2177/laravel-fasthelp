@@ -3,12 +3,20 @@
 namespace Tabadev\FastHelp;
 
 use Illuminate\Support\ServiceProvider;
+use Tabadev\FastHelp\Contracts\SmartReply;
+use Tabadev\FastHelp\Services\Gemini\GeminiSmartReply;
 
 class FastHelpServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/fasthelp.php', 'fasthelp');
+
+        $this->app->bind(SmartReply::class, function () {
+            return match (config('fasthelp.ai.driver', 'gemini')) {
+                default => new GeminiSmartReply,
+            };
+        });
     }
 
     public function boot(): void
