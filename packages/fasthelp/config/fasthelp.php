@@ -12,4 +12,12 @@ return [
     'broadcasting' => [
         'channel_prefix' => 'fasthelp',
     ],
+
+    'agents' => [
+        'resolver' => null,
+    ],
+
+    'presence' => [
+        'stale_after' => 60,
+    ],
 ];
