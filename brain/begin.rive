@@ -1,0 +1,9 @@
+! version = 2.0
+
+// Load all rive files from the modules directory
+! global debug = true
+
+> begin
+    + request
+    - {ok}
+< begin
