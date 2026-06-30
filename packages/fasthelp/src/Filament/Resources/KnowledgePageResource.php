@@ -14,6 +14,10 @@ class KnowledgePageResource extends Resource
 {
     protected static ?string $model = KbPage::class;
 
+    protected static ?string $modelLabel = 'Knowledge Page';
+
+    protected static ?string $pluralModelLabel = 'Knowledge Pages';
+
     protected static ?string $navigationIcon = 'heroicon-o-book-open';
 
     protected static ?string $navigationLabel = 'Knowledge Base';
