@@ -9,7 +9,7 @@
         <style>
             .fh-root{--fh-bg:#fff;--fh-muted:#6b7280;--fh-line:#eceef2;--fh-body:#f6f7f9;
                 position:fixed;inset-block-end:24px;z-index:2147483000;display:flex;flex-direction:column;gap:14px;align-items:flex-end;
-                font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans Arabic",sans-serif;}
+                font-family:var(--fh-font, ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans Arabic",sans-serif);}
             .fh-root.fh-end{inset-inline-end:24px;}
             .fh-root.fh-start{inset-inline-start:24px;align-items:flex-start;}
             .fh-root *{box-sizing:border-box;}

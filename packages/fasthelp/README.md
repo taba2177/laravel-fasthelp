@@ -12,6 +12,7 @@ A drop-in live-support widget for Laravel — real-time client⇄agent chat, onl
 - **Filament admin** — an inbox (`ConversationResource`) with a live agent chat view, an `AgentResource` to manage who can answer chats, and a settings page for widget/AI behavior.
 - **Guest + authenticated identity** — guests are tracked with a signed cookie; logged-in host users are linked automatically and keep their conversation across sessions.
 - **Polished, RTL-aware UI** — modern self-styled chat with SVG icons (no build step required); the widget and agent chat mirror automatically for right-to-left pages (Arabic, Hebrew, …) based on the host page's `dir`/`lang`. Ships English + Arabic copy.
+- **Auto-theme** — by default the widget adopts the host page's font and brand color (`<meta name="theme-color">` or common CSS brand variables such as `--primary`, `--color-primary`, `--brand`, etc.), computing a readable contrast color automatically. Disable with `FASTHELP_WIDGET_AUTO_THEME=false` or the **Match host site theme** toggle in Filament settings; it then falls back to the configured `widget.colors`.
 
 ## Requirements
 
@@ -196,6 +197,7 @@ After publishing `config/fasthelp.php`:
 | `widget.title`                   | `FASTHELP_WIDGET_TITLE`           | `Need help?`                               | Widget header title.                                                    |
 | `widget.launcher_icon`           | `FASTHELP_WIDGET_ICON`            | `heroicon-o-chat-bubble-left-right`        | Launcher button icon.                                                   |
 | `widget.greeting`                | `FASTHELP_WIDGET_GREETING`        | `Hi! How can we help you today?`           | First message shown to visitors.                                        |
+| `widget.auto_theme`              | `FASTHELP_WIDGET_AUTO_THEME`      | `true`                                     | Adopt the host page's font and brand color automatically. Disable to use `widget.colors` only. |
 | `ai.enabled`                     | `FASTHELP_AI_ENABLED`             | `false`                                    | Enable the Gemini first-line responder.                                 |
 | `ai.driver`                      | `FASTHELP_AI_DRIVER`              | `gemini`                                   | AI driver identifier (currently only `gemini` is implemented).          |
 | `ai.api_key`                     | `FASTHELP_GEMINI_KEY`             | `null`                                     | Gemini API key. Never resolved/validated at boot.                       |
