@@ -3,10 +3,12 @@
 namespace Tabadev\FastHelp\Services\Gemini;
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Tabadev\FastHelp\Contracts\SmartReply;
 use Tabadev\FastHelp\Enums\MessageSender;
 use Tabadev\FastHelp\Models\Conversation;
+use Tabadev\FastHelp\Services\Knowledge\KnowledgeRetriever;
 use Tabadev\FastHelp\Services\SmartReplyResult;
 use Tabadev\FastHelp\Support\Settings;
 
@@ -25,8 +27,20 @@ class GeminiSmartReply implements SmartReply
             }
         }
 
+        $kbContext = null;
+        if (config('fasthelp.kb.enabled')) {
+            try {
+                $pages = app(KnowledgeRetriever::class)->retrieve($message);
+                if ($pages->isNotEmpty()) {
+                    $kbContext = $this->buildKbContext($pages);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('GeminiSmartReply: KB retrieval failed, continuing without context: '.$e->getMessage());
+            }
+        }
+
         try {
-            $fullPrompt = $this->buildPrompt($conversation, $message);
+            $fullPrompt = $this->buildPrompt($conversation, $message, $kbContext);
 
             $apiKey = app(Settings::class)->get('ai.api_key');
             $model = app(Settings::class)->get('ai.model', 'gemini-1.5-flash');
@@ -61,9 +75,29 @@ class GeminiSmartReply implements SmartReply
         }
     }
 
-    private function buildPrompt(Conversation $conversation, string $message): string
+    private function buildKbContext(Collection $pages): string
     {
-        $lines = [app(Settings::class)->get('ai.system_prompt')];
+        $block = "You are answering questions about our website. Use ONLY the following pages when relevant, and when a page answers the customer's need, include its URL in your reply so they can go straight there.\n";
+
+        foreach ($pages as $page) {
+            $block .= "\nPage: {$page['title']}";
+            $block .= "\nURL: {$page['url']}";
+            $block .= "\nExcerpt: {$page['excerpt']}";
+            $block .= "\n---";
+        }
+
+        return $block;
+    }
+
+    private function buildPrompt(Conversation $conversation, string $message, ?string $kbContext = null): string
+    {
+        $lines = [];
+
+        if ($kbContext !== null) {
+            $lines[] = $kbContext;
+        }
+
+        $lines[] = app(Settings::class)->get('ai.system_prompt');
 
         $recentMessages = $conversation->messages()
             ->latest()
