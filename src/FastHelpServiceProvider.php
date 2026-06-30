@@ -5,9 +5,11 @@ namespace Tabadev\FastHelp;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
+use Tabadev\FastHelp\Contracts\Embedder;
 use Tabadev\FastHelp\Contracts\SmartReply;
 use Tabadev\FastHelp\Livewire\AgentChat;
 use Tabadev\FastHelp\Livewire\Widget;
+use Tabadev\FastHelp\Services\Gemini\GeminiEmbedder;
 use Tabadev\FastHelp\Services\Gemini\GeminiSmartReply;
 use Tabadev\FastHelp\Support\Settings;
 
@@ -24,6 +26,8 @@ class FastHelpServiceProvider extends ServiceProvider
                 default => new GeminiSmartReply,
             };
         });
+
+        $this->app->bind(Embedder::class, fn () => new GeminiEmbedder);
     }
 
     public function boot(): void
