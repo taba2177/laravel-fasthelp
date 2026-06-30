@@ -69,6 +69,14 @@
             .fh-root:dir(rtl) .fh-send svg,.fh-root:dir(rtl) .fh-handoff svg{transform:scaleX(-1);}
             .fh-bodyw::-webkit-scrollbar{width:7px;}
             .fh-bodyw::-webkit-scrollbar-thumb{background:#d3d7de;border-radius:99px;}
+            .fh-card{display:flex;flex-direction:column;margin-top:6px;border:1px solid var(--fh-line);border-radius:10px;background:#fff;overflow:hidden;text-decoration:none;color:inherit;transition:background .15s;}
+            .fh-card:hover{background:var(--fh-body);}
+            .fh-card-inner{display:flex;align-items:flex-start;gap:0;padding:8px 10px;}
+            .fh-card-thumb{width:56px;height:56px;object-fit:cover;border-radius:6px;flex:0 0 auto;margin-inline-end:10px;}
+            .fh-card-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;}
+            .fh-card .fh-card-title{font-size:12.5px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+            .fh-card .fh-card-desc{font-size:11.5px;color:#4b5563;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+            .fh-card .fh-card-host{font-size:11px;color:var(--fh-muted);margin-top:1px;}
         </style>
 
         @if($open)
@@ -105,7 +113,26 @@
                                 </span>
                             @endif
                             <div>
-                                <div class="fh-bub" dir="auto">{{ $message['body'] }}</div>
+                                <div class="fh-bub" dir="auto">{!! \Tabadev\FastHelp\Support\Linkify::toHtml($message['body']) !!}</div>
+                                @if(!empty($message['previews']))
+                                    @foreach($message['previews'] as $p)
+                                        @php $host = parse_url($p['url'], PHP_URL_HOST); @endphp
+                                        <a class="fh-card" href="{{ $p['url'] }}" target="_blank" rel="noopener noreferrer">
+                                            <div class="fh-card-inner">
+                                                @if(!empty($p['image']))
+                                                    <img class="fh-card-thumb" src="{{ $p['image'] }}" alt="" loading="lazy">
+                                                @endif
+                                                <div class="fh-card-text">
+                                                    <span class="fh-card-title">{{ $p['title'] }}</span>
+                                                    @if(!empty($p['description']))
+                                                        <span class="fh-card-desc">{{ \Illuminate\Support\Str::limit($p['description'], 120) }}</span>
+                                                    @endif
+                                                    <span class="fh-card-host">{{ $host }}</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    @endforeach
+                                @endif
                                 @if($t !== 'system' && !empty($message['created_at']))
                                     <div class="fh-meta">{{ \Illuminate\Support\Carbon::parse($message['created_at'])->format('H:i') }}</div>
                                 @endif

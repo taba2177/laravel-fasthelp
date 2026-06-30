@@ -5,6 +5,7 @@ namespace Tabadev\FastHelp\Livewire;
 use Livewire\Component;
 use Tabadev\FastHelp\Models\Conversation;
 use Tabadev\FastHelp\Services\ConversationService;
+use Tabadev\FastHelp\Services\Links\LinkPreviewService;
 use Tabadev\FastHelp\Services\PresenceService;
 
 class AgentChat extends Component
@@ -102,16 +103,27 @@ class AgentChat extends Component
             return;
         }
 
+        $previewService = app(LinkPreviewService::class);
+
         $this->messages = $conversation->messages()
             ->orderBy('id')
             ->get()
-            ->map(fn ($message) => [
-                'id' => $message->id,
-                'sender_type' => $message->sender_type->value,
-                'sender_id' => $message->sender_id,
-                'body' => $message->body,
-                'created_at' => $message->created_at?->toIso8601String(),
-            ])
+            ->map(function ($message) use ($previewService) {
+                try {
+                    $previews = $previewService->previewsFor($message->body ?? '');
+                } catch (\Throwable) {
+                    $previews = [];
+                }
+
+                return [
+                    'id' => $message->id,
+                    'sender_type' => $message->sender_type->value,
+                    'sender_id' => $message->sender_id,
+                    'body' => $message->body,
+                    'created_at' => $message->created_at?->toIso8601String(),
+                    'previews' => $previews,
+                ];
+            })
             ->all();
     }
 
