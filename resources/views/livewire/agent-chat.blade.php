@@ -40,6 +40,14 @@
         .fhc-send:hover{filter:brightness(1.08);transform:scale(1.05);}
         .fhc-send svg{width:19px;height:19px;}
         .fhc-root:dir(rtl) .fhc-send svg{transform:scaleX(-1);}
+        .fhc-card{display:flex;flex-direction:column;margin-top:6px;border:1px solid var(--fhc-line);border-radius:10px;background:#fff;overflow:hidden;text-decoration:none;color:inherit;transition:background .15s;}
+        .fhc-card:hover{background:var(--fhc-body);}
+        .fhc-card-inner{display:flex;align-items:flex-start;padding:8px 10px;}
+        .fhc-card-thumb{width:56px;height:56px;object-fit:cover;border-radius:6px;flex:0 0 auto;margin-inline-end:10px;}
+        .fhc-card-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;}
+        .fhc-card .fhc-card-title{font-size:12.5px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .fhc-card .fhc-card-desc{font-size:11.5px;color:#4b5563;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+        .fhc-card .fhc-card-host{font-size:11px;color:var(--fhc-muted);margin-top:1px;}
     </style>
 
     <div class="fhc-head">
@@ -72,7 +80,26 @@
                     @unless ($t === 'system')
                         <div class="fhc-label">{{ $t }}</div>
                     @endunless
-                    <div class="fhc-bub" dir="auto">{{ $message['body'] }}</div>
+                    <div class="fhc-bub" dir="auto">{!! \Tabadev\FastHelp\Support\Linkify::toHtml($message['body']) !!}</div>
+                    @if(!empty($message['previews']))
+                        @foreach($message['previews'] as $p)
+                            @php $host = parse_url($p['url'], PHP_URL_HOST); @endphp
+                            <a class="fhc-card" href="{{ $p['url'] }}" target="_blank" rel="noopener noreferrer">
+                                <div class="fhc-card-inner">
+                                    @if(!empty($p['image']))
+                                        <img class="fhc-card-thumb" src="{{ $p['image'] }}" alt="" loading="lazy">
+                                    @endif
+                                    <div class="fhc-card-text">
+                                        <span class="fhc-card-title">{{ $p['title'] }}</span>
+                                        @if(!empty($p['description']))
+                                            <span class="fhc-card-desc">{{ \Illuminate\Support\Str::limit($p['description'], 120) }}</span>
+                                        @endif
+                                        <span class="fhc-card-host">{{ $host }}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        @endforeach
+                    @endif
                     @if($t !== 'system' && !empty($message['created_at']))
                         <div class="fhc-meta">{{ \Illuminate\Support\Carbon::parse($message['created_at'])->format('H:i') }}</div>
                     @endif
