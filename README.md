@@ -10,6 +10,7 @@ A drop-in live-support widget for Laravel — real-time client⇄agent chat, onl
 - **AI first-line response with human handoff** — an optional Gemini-powered responder can answer first and hand off to a human on request or failure.
 - **Filament admin** — an inbox (`ConversationResource`) with a live agent chat view, an `AgentResource` to manage who can answer chats, and a settings page for widget/AI behavior.
 - **Guest + authenticated identity** — guests are tracked with a signed cookie; logged-in host users are linked automatically and keep their conversation across sessions.
+- **Polished, RTL-aware UI** — modern self-styled chat with SVG icons (no build step required); the widget and agent chat mirror automatically for right-to-left pages (Arabic, Hebrew, …) based on the host page's `dir`/`lang`. Ships English + Arabic copy.
 
 ## Requirements
 
