@@ -8,6 +8,7 @@ A drop-in live-support widget for Laravel — real-time client⇄agent chat, onl
 - **Live client⇄agent chat** — guests and authenticated users chat with human agents in real time.
 - **Online presence** — visitors see how many agents are currently available; agents see a live roster.
 - **AI first-line response with human handoff** — an optional Gemini-powered responder can answer first and hand off to a human on request or failure.
+- **Site knowledge base (RAG)** — scan the host website into an embeddings-backed knowledge base so the AI answers from real site content and guides customers with relevant URLs; links render as rich SEO preview cards in the chat.
 - **Filament admin** — an inbox (`ConversationResource`) with a live agent chat view, an `AgentResource` to manage who can answer chats, and a settings page for widget/AI behavior.
 - **Guest + authenticated identity** — guests are tracked with a signed cookie; logged-in host users are linked automatically and keep their conversation across sessions.
 - **Polished, RTL-aware UI** — modern self-styled chat with SVG icons (no build step required); the widget and agent chat mirror automatically for right-to-left pages (Arabic, Hebrew, …) based on the host page's `dir`/`lang`. Ships English + Arabic copy.
@@ -129,6 +130,53 @@ Behavior:
   - the AI call fails or returns an empty response.
 - The model, system prompt, and handoff keywords are editable at runtime from the Filament **FastHelp Settings** page, or via config/env at deploy time.
 
+## Knowledge base & smart URL guidance
+
+### What it does
+
+When the knowledge base is enabled, FastHelp crawls the host website and stores each page's content as a vector embedding. When a visitor sends a message, the AI responder retrieves the most relevant pages (RAG — retrieval-augmented generation) and uses them to ground its answer in real site content. The response can include direct URLs to matching pages, and those links render as rich SEO preview cards — showing the page title, description, image, and hostname — in both the floating widget and the Filament agent chat.
+
+For internal links, metadata comes from the crawled page. For external URLs referenced by the AI, the package fetches OpenGraph data on demand and caches it in the `fasthelp_link_previews` table.
+
+### Enabling it
+
+Set the following environment variables (the Gemini API key is shared with the AI responder):
+
+```env
+FASTHELP_KB_ENABLED=true
+FASTHELP_GEMINI_KEY=your-gemini-api-key
+```
+
+Alternatively, toggle **Knowledge base** on from the Filament **FastHelp Settings** page — no deploy required.
+
+### Scanning the site
+
+Dispatch a crawl from the command line:
+
+```bash
+php artisan fasthelp:scan
+```
+
+Options:
+
+| Option | Purpose |
+|--------|---------|
+| `--sync` | Run the crawl inline instead of dispatching a queue job |
+| `--url=` | Override the base URL to crawl (default: `kb.base_url`) |
+| `--max=` | Override the maximum number of pages to crawl (default: `kb.max_pages`) |
+
+You can also trigger a scan from the Filament **Knowledge Base** screen via the **"Scan website"** button (dispatches the queued job).
+
+**Queue worker:** the default `fasthelp:scan` (without `--sync`) dispatches a `CrawlSiteJob`. You need a running queue worker (`php artisan queue:work`) unless you use `--sync`.
+
+**Scheduled scanning:** set `FASTHELP_KB_SCHEDULE=daily` or `FASTHELP_KB_SCHEDULE=weekly` in your `.env`. The package registers the scheduled command automatically; no changes to `app/Console/Kernel.php` are needed.
+
+### SEO link preview cards
+
+- **Internal links** — title, description, and canonical URL are stored during the crawl and served from the database.
+- **External links** — fetched via OpenGraph on first reference, then cached in `fasthelp_link_previews`.
+- Cards display: title · short description · image (if available) · hostname. They appear in both the chat widget and the Filament agent view.
+
 ## Configuration reference
 
 After publishing `config/fasthelp.php`:
@@ -158,6 +206,16 @@ After publishing `config/fasthelp.php`:
 | `ai.offline_behavior`            | `FASTHELP_AI_OFFLINE_BEHAVIOR`    | `capture_email`                            | `ai_only` or `capture_email` — behavior when no agent is online.        |
 | `routes.prefix`                  | `FASTHELP_ROUTE_PREFIX`           | `fasthelp`                                 | URL prefix for the widget's HTTP endpoints.                             |
 | `routes.middleware`              | —                                  | `['web']`                                  | Middleware applied to the widget's HTTP routes.                         |
+| `kb.enabled`                     | `FASTHELP_KB_ENABLED`             | `false`                                    | Enable the knowledge-base crawler and RAG retrieval.                    |
+| `kb.base_url`                    | `FASTHELP_KB_BASE_URL`            | `app.url`                                  | Root URL to crawl (defaults to the host app's `APP_URL`).              |
+| `kb.max_pages`                   | `FASTHELP_KB_MAX_PAGES`           | `100`                                      | Maximum number of pages to index per scan.                              |
+| `kb.same_domain_only`            | `FASTHELP_KB_SAME_DOMAIN`         | `true`                                     | Skip links that lead to a different domain.                             |
+| `kb.respect_robots`              | `FASTHELP_KB_RESPECT_ROBOTS`      | `true`                                     | Honor `robots.txt` directives during crawling.                         |
+| `kb.embedding_model`             | `FASTHELP_KB_EMBEDDING_MODEL`     | `text-embedding-004`                       | Gemini embedding model used to vectorise pages.                         |
+| `kb.retrieve_top_k`              | `FASTHELP_KB_TOP_K`               | `4`                                        | Number of KB pages retrieved per query for RAG context.                 |
+| `kb.min_similarity`              | `FASTHELP_KB_MIN_SIMILARITY`      | `0.65`                                     | Cosine-similarity threshold; pages below this score are excluded.       |
+| `kb.user_agent`                  | `FASTHELP_KB_USER_AGENT`          | `FastHelpBot/1.0`                          | User-Agent header sent during crawling.                                 |
+| `kb.schedule`                    | `FASTHELP_KB_SCHEDULE`            | `off`                                      | Auto-schedule the crawl: `off`, `daily`, or `weekly`.                  |
 
 `widget.*` and `ai.*` keys (except `ai.api_key`/`ai.driver`) are also editable at runtime from the Filament **FastHelp Settings** page; those overrides are stored in the `fasthelp_settings` table and take precedence over the config file.
 
