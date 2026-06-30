@@ -7,6 +7,7 @@ use Filament\Panel;
 use Tabadev\FastHelp\Filament\Pages\FastHelpSettings;
 use Tabadev\FastHelp\Filament\Resources\AgentResource;
 use Tabadev\FastHelp\Filament\Resources\ConversationResource;
+use Tabadev\FastHelp\Filament\Resources\KnowledgePageResource;
 
 class FastHelpPlugin implements Plugin
 {
@@ -41,6 +42,7 @@ class FastHelpPlugin implements Plugin
         return [
             ConversationResource::class,
             AgentResource::class,
+            KnowledgePageResource::class,
         ];
     }
 
