@@ -40,6 +40,7 @@ return [
         'title' => env('FASTHELP_WIDGET_TITLE', 'Need help?'),
         'launcher_icon' => env('FASTHELP_WIDGET_ICON', 'heroicon-o-chat-bubble-left-right'),
         'greeting' => env('FASTHELP_WIDGET_GREETING', 'Hi! How can we help you today?'),
+        'auto_theme' => (bool) env('FASTHELP_WIDGET_AUTO_THEME', true),
     ],
 
     // AI first-line responder.

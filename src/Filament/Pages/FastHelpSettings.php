@@ -59,6 +59,7 @@ class FastHelpSettings extends Page implements HasForms
         'widget.position',
         'widget.colors.primary',
         'widget.enabled',
+        'widget.auto_theme',
         'ai.enabled',
         'ai.model',
         'ai.system_prompt',
@@ -103,6 +104,9 @@ class FastHelpSettings extends Page implements HasForms
                             ->label('Primary color'),
                         Toggle::make('widget.enabled')
                             ->label('Enabled'),
+                        Toggle::make('widget.auto_theme')
+                            ->label('Match host site theme')
+                            ->helperText('Automatically use the host page\'s font and brand color'),
                     ]),
                 Section::make('AI')
                     ->schema([
