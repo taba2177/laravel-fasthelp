@@ -1,5 +1,7 @@
 # FastHelp
 
+[![tests](https://github.com/taba2177/laravel-fasthelp/actions/workflows/tests.yml/badge.svg)](https://github.com/taba2177/laravel-fasthelp/actions/workflows/tests.yml)
+
 A drop-in live-support widget for Laravel — real-time client⇄agent chat, online presence, an optional AI first-line responder, and a Filament admin, all installable as a single package.
 
 ## Features
