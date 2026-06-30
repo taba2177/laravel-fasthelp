@@ -59,4 +59,18 @@ return [
         'prefix' => env('FASTHELP_ROUTE_PREFIX', 'fasthelp'),
         'middleware' => ['web'],
     ],
+
+    // Knowledge-base crawler and retrieval settings.
+    'kb' => [
+        'enabled' => (bool) env('FASTHELP_KB_ENABLED', false),
+        'base_url' => env('FASTHELP_KB_BASE_URL', env('APP_URL', 'http://localhost')),
+        'max_pages' => (int) env('FASTHELP_KB_MAX_PAGES', 100),
+        'same_domain_only' => (bool) env('FASTHELP_KB_SAME_DOMAIN', true),
+        'respect_robots' => (bool) env('FASTHELP_KB_RESPECT_ROBOTS', true),
+        'embedding_model' => env('FASTHELP_KB_EMBEDDING_MODEL', 'text-embedding-004'),
+        'retrieve_top_k' => (int) env('FASTHELP_KB_TOP_K', 4),
+        'min_similarity' => (float) env('FASTHELP_KB_MIN_SIMILARITY', 0.65),
+        'user_agent' => env('FASTHELP_KB_USER_AGENT', 'FastHelpBot/1.0 (+https://github.com/taba2177/laravel-fasthelp)'),
+        'schedule' => env('FASTHELP_KB_SCHEDULE', 'off'), // off|daily|weekly
+    ],
 ];
