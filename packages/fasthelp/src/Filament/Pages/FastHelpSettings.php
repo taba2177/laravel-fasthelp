@@ -64,6 +64,9 @@ class FastHelpSettings extends Page implements HasForms
         'ai.system_prompt',
         'ai.handoff_keywords',
         'ai.offline_behavior',
+        'kb.enabled',
+        'kb.base_url',
+        'kb.max_pages',
     ];
 
     public function mount(): void
@@ -118,6 +121,17 @@ class FastHelpSettings extends Page implements HasForms
                                 'ai_only' => 'AI only',
                                 'capture_email' => 'Capture email',
                             ]),
+                    ]),
+                Section::make('Knowledge base')
+                    ->schema([
+                        Toggle::make('kb.enabled')
+                            ->label('Enabled'),
+                        TextInput::make('kb.base_url')
+                            ->label('Base URL')
+                            ->url(),
+                        TextInput::make('kb.max_pages')
+                            ->label('Max pages')
+                            ->numeric(),
                     ]),
             ]);
     }
