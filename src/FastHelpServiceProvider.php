@@ -2,9 +2,11 @@
 
 namespace Tabadev\FastHelp;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
+use Tabadev\FastHelp\Console\ScanSiteCommand;
 use Tabadev\FastHelp\Contracts\Embedder;
 use Tabadev\FastHelp\Contracts\SmartReply;
 use Tabadev\FastHelp\Livewire\AgentChat;
@@ -41,6 +43,8 @@ class FastHelpServiceProvider extends ServiceProvider
         $this->registerPublishing();
         $this->registerLivewireComponents();
         $this->registerBladeDirectives();
+        $this->registerCommands();
+        $this->registerScheduling();
     }
 
     /**
@@ -103,6 +107,38 @@ class FastHelpServiceProvider extends ServiceProvider
         }
 
         Blade::directive('fastHelpWidget', fn () => "<?php echo view('fasthelp::embed')->render(); ?>");
+    }
+
+    /**
+     * Register Artisan commands provided by the package.
+     */
+    protected function registerCommands(): void
+    {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
+        $this->commands([ScanSiteCommand::class]);
+    }
+
+    /**
+     * Schedule the crawl command when the config opts in (daily or weekly).
+     *
+     * Uses app->booted() so the Schedule instance is guaranteed to exist.
+     */
+    protected function registerScheduling(): void
+    {
+        $this->app->booted(function () {
+            $freq = config('fasthelp.kb.schedule', 'off');
+
+            if (! in_array($freq, ['daily', 'weekly'], true)) {
+                return;
+            }
+
+            $schedule = $this->app->make(Schedule::class);
+            $event = $schedule->command('fasthelp:scan');
+            $freq === 'weekly' ? $event->weekly() : $event->daily();
+        });
     }
 
     /**
